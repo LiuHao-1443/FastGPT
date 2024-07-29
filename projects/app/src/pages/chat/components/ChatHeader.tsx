@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flex, useTheme, Box } from '@chakra-ui/react';
+import { Flex, useTheme, Box, IconButton } from '@chakra-ui/react';
 import { useSystemStore } from '@/web/common/system/useSystemStore';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import Avatar from '@/components/Avatar';
@@ -18,12 +18,17 @@ const ChatHeader = ({
   chatData,
   history,
   showHistory,
-  onRoute2AppDetail
+  onRoute2AppDetail,
+  // 通达演示环境，去除功能
+  showSlider = false,
+  showControl = false
 }: {
   chatData: InitChatResponse;
   history: ChatItemType[];
   showHistory?: boolean;
   onRoute2AppDetail?: () => void;
+  showSlider?: boolean;
+  showControl?: boolean;
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -70,7 +75,7 @@ const ChatHeader = ({
         </>
       ) : (
         <>
-          {showHistory && (
+          {showSlider && showHistory && (
             <MyIcon
               name={'menu'}
               w={'20px'}
@@ -81,7 +86,7 @@ const ChatHeader = ({
           )}
 
           <Flex px={3} alignItems={'center'} flex={'1 0 0'} w={0} justifyContent={'center'}>
-            <Avatar src={chatData.app.avatar} w={'16px'} />
+            {/* <Avatar src={chatData.app.avatar} w={'16px'} /> */}
             <Box ml={1} className="textEllipsis" onClick={onRoute2AppDetail}>
               {chatData.app.name}
             </Box>
@@ -90,7 +95,7 @@ const ChatHeader = ({
       )}
 
       {/* control */}
-      {!isPlugin && <ToolMenu history={history} />}
+      {showControl && !isPlugin && <ToolMenu history={history} />}
     </Flex>
   );
 };

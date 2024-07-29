@@ -237,5 +237,10 @@ export const iconPaths = {
   text: () => import('./icons/text.svg'),
   union: () => import('./icons/union.svg'),
   user: () => import('./icons/user.svg'),
-  wx: () => import('./icons/wx.svg')
+  wx: () => import('./icons/wx.svg'),
+
+  // New icon
+  'notice/helper': () => import('./icons/notice/helper.svg'),
+  'appcenter/form/helper': () => import('./icons/appcenter/form/helper.svg'),
+  'core/chat/quickCommand': () => import('./icons/core/chat/quickCommand.svg')
 };

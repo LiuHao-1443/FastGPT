@@ -432,6 +432,8 @@
       "New Chat": "New conversation",
       "Pin": "Pin",
       "Question Guide": "Guess what you want to ask",
+      "Quick Command": "Quick Command",
+      "Quick Command No Action": "Quick command does not define a valid event, please check",
       "Quote": "Quote",
       "Quote Amount": "Dataset quotes ({{amount}} items)",
       "Read Mark Description": "View introduction to marking function",

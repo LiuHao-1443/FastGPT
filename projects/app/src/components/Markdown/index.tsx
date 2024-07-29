@@ -9,12 +9,14 @@ import RemarkGfm from 'remark-gfm';
 import styles from './index.module.scss';
 import dynamic from 'next/dynamic';
 
-import { Link, Button } from '@chakra-ui/react';
+import { Link, Button, Text, Box, Flex, useTheme } from '@chakra-ui/react';
 import MyTooltip from '@fastgpt/web/components/common/MyTooltip';
 import { useTranslation } from 'next-i18next';
 import { EventNameEnum, eventBus } from '@/web/common/utils/eventbus';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import { MARKDOWN_QUOTE_SIGN } from '@fastgpt/global/core/chat/constants';
+import ChatBoxDivider from '../core/chat/Divider';
+import { useToast } from '@fastgpt/web/hooks/useToast';
 
 const CodeLight = dynamic(() => import('./CodeLight'), { ssr: false });
 const MermaidCodeBlock = dynamic(() => import('./img/MermaidCodeBlock'), { ssr: false });
@@ -51,23 +53,113 @@ const Markdown = ({
     []
   );
 
-  const formatSource = source
+  const { toast } = useToast();
+  const { t } = useTranslation();
+  const theme = useTheme();
+
+  const parseJsonSafe = (jsonString: string) => {
+    try {
+      return JSON.parse(jsonString);
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const extractAndParseActions = (source: string) => {
+    const actionRegex = /SYSTEM_ACTION_BEGIN\|(.*?)\|SYSTEM_ACTION_END\n?/g;
+    let match;
+    const actions = [];
+    let newSource = source;
+
+    while ((match = actionRegex.exec(source)) !== null) {
+      const jsonString = match[1];
+      const parsedJson = parseJsonSafe(jsonString);
+      if (parsedJson) {
+        actions.push(parsedJson);
+      }
+      // Remove the matched part from the source including the trailing newline
+      newSource = newSource.replace(match[0], '');
+    }
+
+    return { actions, newSource };
+  };
+
+  // Example usage:
+  const { actions, newSource } = extractAndParseActions(source);
+  // You can now use `actions` as needed
+
+  const handleClick = (action: any, index: number) => {
+    // 在这里处理点击事件，可以根据 action 对象和 index 参数进行操作
+    let noAction = true;
+
+    if (action['ACTION']) {
+      if (action['ACTION'] === 'OPEN_NEW_WINDOW' && action['URL']) {
+        noAction = false;
+        window.open(action['URL'], '_blank'); // 打开新窗口
+        return;
+      }
+    }
+
+    if (!noAction) {
+      toast({
+        status: 'warning',
+        title: t('common:core.chat.Quick Command No Action')
+      });
+    }
+  };
+
+  const formatSource = newSource
     // .replace(/\\n/g, '\n')
     .replace(/(http[s]?:\/\/[^\s，。]+)([。，])/g, '$1 $2')
     .replace(/\n*(\[QUOTE SIGN\]\(.*\))/g, '$1');
 
   return (
-    <ReactMarkdown
-      className={`markdown ${styles.markdown}
+    <>
+      <ReactMarkdown
+        className={`markdown ${styles.markdown}
       ${showAnimation ? `${formatSource ? styles.waitingAnimation : styles.animation}` : ''}
     `}
-      remarkPlugins={[RemarkMath, [RemarkGfm, { singleTilde: false }], RemarkBreaks]}
-      rehypePlugins={[RehypeKatex]}
-      components={components}
-      linkTarget={'_blank'}
-    >
-      {formatSource}
-    </ReactMarkdown>
+        remarkPlugins={[RemarkMath, [RemarkGfm, { singleTilde: false }], RemarkBreaks]}
+        rehypePlugins={[RehypeKatex]}
+        components={components}
+        linkTarget={'_blank'}
+      >
+        {formatSource}
+      </ReactMarkdown>
+      {actions.length > 0 && (
+        <Box mt={2}>
+          <ChatBoxDivider
+            icon="core/chat/quickCommand"
+            text={t('common:core.chat.Quick Command')}
+          />
+          <Flex alignItems={'center'} flexWrap={'wrap'} gap={2}>
+            {actions.map((action, index) => (
+              <Flex
+                key={action.text}
+                alignItems={'center'}
+                flexWrap={'wrap'}
+                fontSize={'xs'}
+                border={theme.borders.sm}
+                py={'1px'}
+                px={3}
+                borderRadius={'md'}
+                _hover={{
+                  backgroundColor: 'gray.100' // 你可以根据需要调整颜色
+                }}
+                overflow={'hidden'}
+                position={'relative'}
+                cursor="pointer"
+                onClick={() => handleClick(action, index)}
+              >
+                <Box className="textEllipsis" flex={'1 0 0'}>
+                  {action['TEXT']}
+                </Box>
+              </Flex>
+            ))}
+          </Flex>
+        </Box>
+      )}
+    </>
   );
 };
 
