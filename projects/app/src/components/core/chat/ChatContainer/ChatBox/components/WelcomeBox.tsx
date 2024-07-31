@@ -15,29 +15,40 @@ const WelcomeBox = forwardRef(({ welcomeText }, ref) => {
   const appAvatar = useContextSelector(ChatBoxContext, (v) => v.appAvatar);
   const { isPc } = useSystem();
   const containerRef = useRef(null);
+  const [containerWidth, setContainerWidth] = useState(0);
   const [showHelper, setShowHelper] = useState(false);
   const [cardWidth, setCardWidth] = useState('100%');
 
   useEffect(() => {
+    const containerElement = containerRef.current;
+
     const handleResize = () => {
-      if (containerRef.current) {
-        const containerWidth = (containerRef.current as HTMLElement).offsetWidth;
-        setCardWidth(`${containerWidth}px`);
+      if (containerElement) {
+        const width = (containerElement as HTMLElement).offsetWidth;
+        setContainerWidth(width);
       }
     };
 
-    window.addEventListener('resize', handleResize);
-    handleResize(); // Call the function initially to set the correct width
+    const observer = new ResizeObserver(handleResize);
+    if (containerElement) {
+      observer.observe(containerElement);
+    }
 
-    setTimeout(() => {
-      handleResize();
-      setShowHelper(true);
-    }, 100);
+    handleResize(); // Initial call to set the correct width
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      if (containerElement) {
+        observer.unobserve(containerElement);
+      }
     };
   }, []);
+
+  useEffect(() => {
+    if (containerWidth > 100) {
+      setCardWidth(`${containerWidth}px`);
+      setShowHelper(true);
+    }
+  }, [containerWidth]);
 
   const handleClick = (text: string) => {
     eventBus.emit(EventNameEnum.sendQuestion, { text });
