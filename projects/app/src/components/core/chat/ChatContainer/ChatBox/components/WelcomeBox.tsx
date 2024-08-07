@@ -150,7 +150,7 @@ const WelcomeBox = forwardRef(({ welcomeText }, ref) => {
             p={0}
             ml={isPc ? '15px' : '0px'}
             cursor={'pointer'}
-            onClick={() => handleClick('创建一个关于员工信息登记的表单')}
+            onClick={() => handleClick('创建一个关于员工信息登记的表单，表单内容由你决定')}
           >
             <CardBody p={0}>
               <Flex>
