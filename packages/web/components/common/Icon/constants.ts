@@ -240,6 +240,7 @@ export const iconPaths = {
   wx: () => import('./icons/wx.svg'),
 
   // New icon
+  'knowledge/helper': () => import('./icons/knowledge/helper.svg'),
   'notice/helper': () => import('./icons/notice/helper.svg'),
   'appcenter/form/helper': () => import('./icons/appcenter/form/helper.svg'),
   'core/chat/quickCommand': () => import('./icons/core/chat/quickCommand.svg')
