@@ -84,9 +84,30 @@ const Markdown = ({
     return { actions, newSource };
   };
 
+  const extractAndParseGuessYouWantActions = (source: string) => {
+    const actionRegex = /SYSTEM_GUESS_YOU_WANT_BEGIN\|(.*?)\|SYSTEM_GUESS_YOU_WANT_END\n?/g;
+    let match;
+    const guessYouWantActions = [];
+    let newSource = source;
+
+    while ((match = actionRegex.exec(source)) !== null) {
+      const jsonString = match[1];
+      const parsedJson = parseJsonSafe(jsonString);
+      if (parsedJson) {
+        guessYouWantActions.push(parsedJson);
+      }
+      // Remove the matched part from the source including the trailing newline
+      newSource = newSource.replace(match[0], '');
+    }
+
+    return { guessYouWantActions, newSource };
+  };
+
   // Example usage:
-  const { actions, newSource } = extractAndParseActions(source);
+  var { actions, newSource } = extractAndParseActions(source);
   // You can now use `actions` as needed
+
+  var { guessYouWantActions, newSource } = extractAndParseGuessYouWantActions(newSource);
 
   const handleClick = (action: any, index: number) => {
     // 在这里处理点击事件，可以根据 action 对象和 index 参数进行操作
@@ -153,6 +174,78 @@ const Markdown = ({
               >
                 <Box className="textEllipsis" flex={'1 0 0'}>
                   {action['TEXT']}
+                </Box>
+              </Flex>
+            ))}
+          </Flex>
+        </Box>
+      )}
+      {guessYouWantActions.length > 0 && (
+        <Box mt={2}>
+          <ChatBoxDivider
+            icon="core/chat/guessYouWant"
+            text={t('common:core.chat.Guess You Want')}
+          />
+          <Flex alignItems={'center'} flexWrap={'wrap'} gap={2}>
+            {guessYouWantActions.map((action, index) => (
+              <Flex
+                key={action.text}
+                alignItems={'center'}
+                flexWrap={'wrap'}
+                fontSize={'xs'}
+                border={theme.borders.sm}
+                py={'1px'}
+                px={3}
+                borderRadius={'md'}
+                _hover={{
+                  '.controller': {
+                    display: 'flex'
+                  }
+                }}
+                overflow={'hidden'}
+                position={'relative'}
+              >
+                <Box className="textEllipsis" flex={'1 0 0'}>
+                  {action['TEXT']}
+                </Box>
+                <Box
+                  className="controller"
+                  display={'none'}
+                  pr={2}
+                  position={'absolute'}
+                  right={0}
+                  left={0}
+                  justifyContent={'flex-end'}
+                  alignItems={'center'}
+                  h={'100%'}
+                  lineHeight={0}
+                  bg={`linear-gradient(to left, white,white min(60px,100%),rgba(255,255,255,0) 80%)`}
+                >
+                  <MyTooltip label={t('common:core.chat.markdown.Edit Question')}>
+                    <MyIcon
+                      name={'edit'}
+                      w={'14px'}
+                      cursor={'pointer'}
+                      _hover={{
+                        color: 'green.600'
+                      }}
+                      onClick={() =>
+                        eventBus.emit(EventNameEnum.editQuestion, { text: action['TEXT'] })
+                      }
+                    />
+                  </MyTooltip>
+                  <MyTooltip label={t('common:core.chat.markdown.Send Question')}>
+                    <MyIcon
+                      ml={4}
+                      name={'core/chat/sendLight'}
+                      w={'14px'}
+                      cursor={'pointer'}
+                      _hover={{ color: 'primary.500' }}
+                      onClick={() =>
+                        eventBus.emit(EventNameEnum.sendQuestion, { text: action['TEXT'] })
+                      }
+                    />
+                  </MyTooltip>
                 </Box>
               </Flex>
             ))}
