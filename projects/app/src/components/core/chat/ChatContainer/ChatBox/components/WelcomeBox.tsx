@@ -83,7 +83,6 @@ const WelcomeBox = forwardRef(({ welcomeText }, ref) => {
             boxShadow={'0 0 8px rgba(0,0,0,0.15)'}
             w={cardWidth}
             p={0}
-            ml={isPc ? '15px' : '0px'}
             cursor={'pointer'}
             onClick={() => handleClick('请说一下通达信科的公司简介')}
           >
@@ -148,9 +147,8 @@ const WelcomeBox = forwardRef(({ welcomeText }, ref) => {
             boxShadow={'0 0 8px rgba(0,0,0,0.15)'}
             w={cardWidth}
             p={0}
-            ml={isPc ? '15px' : '0px'}
             cursor={'pointer'}
-            onClick={() => handleClick('创建一个关于员工信息登记的表单，表单内容由你决定')}
+            onClick={() => handleClick('创建一个关于员工信息登记的表单，表单内容由你来设计')}
           >
             <CardBody p={0}>
               <Flex>
@@ -160,7 +158,7 @@ const WelcomeBox = forwardRef(({ welcomeText }, ref) => {
                     <Heading fontSize="sm">应用中心表单助手</Heading>
                   </Flex>
                   <Text fontSize="xs" color={'#949494'}>
-                    创建一个关于员工信息登记的表单，表单内容由你决定
+                    创建一个关于员工信息登记的表单，表单内容由你来设计
                   </Text>
                 </Stack>
                 <MyIcon mr={1} name={'common/rightArrowLight'} w={'10px'} />
