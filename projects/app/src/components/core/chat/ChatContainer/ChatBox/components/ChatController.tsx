@@ -141,34 +141,38 @@ const ChatController = ({
               </MyTooltip>
             );
           }
-          return (
-            <MyTooltip label={t('common:core.app.TTS start')}>
-              <MyIcon
-                {...controlIconStyle}
-                name={'common/voiceLight'}
-                _hover={{ color: '#E74694' }}
-                onClick={async () => {
-                  setAudioPlayingChatId(chat.dataId);
-                  const response = await playAudioByText({
-                    buffer: chat.ttsBuffer,
-                    text: chatText
-                  });
+          // 通达演示环境，去除功能
+          const showTTS = false;
+          if (showTTS) {
+            return (
+              <MyTooltip label={t('common:core.app.TTS start')}>
+                <MyIcon
+                  {...controlIconStyle}
+                  name={'common/voiceLight'}
+                  _hover={{ color: '#E74694' }}
+                  onClick={async () => {
+                    setAudioPlayingChatId(chat.dataId);
+                    const response = await playAudioByText({
+                      buffer: chat.ttsBuffer,
+                      text: chatText
+                    });
 
-                  if (!setChatHistories || !response.buffer) return;
-                  setChatHistories((state) =>
-                    state.map((item) =>
-                      item.dataId === chat.dataId
-                        ? {
-                            ...item,
-                            ttsBuffer: response.buffer
-                          }
-                        : item
-                    )
-                  );
-                }}
-              />
-            </MyTooltip>
-          );
+                    if (!setChatHistories || !response.buffer) return;
+                    setChatHistories((state) =>
+                      state.map((item) =>
+                        item.dataId === chat.dataId
+                          ? {
+                              ...item,
+                              ttsBuffer: response.buffer
+                            }
+                          : item
+                      )
+                    );
+                  }}
+                />
+              </MyTooltip>
+            );
+          }
         })()}
       {!!onMark && (
         <MyTooltip label={t('common:core.chat.Mark')}>
