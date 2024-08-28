@@ -110,11 +110,25 @@ export const streamFetch = ({
       const variables = data?.variables || {};
       variables.cTime = formatTime2YMDHMW();
 
-      const phpsessid = getCookie('phpsessid');
+      const phpsessid = getCookie('PHPSESSID');
       if (phpsessid) {
-        variables.SYSTEM_SID = phpsessid;
+        variables.SYSTEM_OA_SESS_ID = phpsessid;
       } else {
-        variables.SYSTEM_SID = '';
+        variables.SYSTEM_OA_SESS_ID = '';
+      }
+
+      const user_name_cookie = getCookie('USER_NAME_COOKIE');
+      if (user_name_cookie) {
+        variables.SYSTEM_OA_USER_NAME = user_name_cookie;
+      } else {
+        variables.SYSTEM_OA_USER_NAME = '';
+      }
+
+      const oa_user_ud = getCookie('OA_USER_ID');
+      if (oa_user_ud) {
+        variables.SYSTEM_OA_USER_ID = phpsessid;
+      } else {
+        variables.SYSTEM_OA_USER_ID = '';
       }
 
       const originOrHost = getOriginOrHost();
