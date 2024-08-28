@@ -113,11 +113,15 @@ export const streamFetch = ({
       const phpsessid = getCookie('phpsessid');
       if (phpsessid) {
         variables.SYSTEM_SID = phpsessid;
+      } else {
+        variables.SYSTEM_SID = '';
       }
 
       const originOrHost = getOriginOrHost();
       if (originOrHost) {
         variables.SYSTEM_ORIGIN = originOrHost;
+      } else {
+        variables.SYSTEM_ORIGIN = '';
       }
 
       const requestData = {
