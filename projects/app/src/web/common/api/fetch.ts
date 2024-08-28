@@ -110,6 +110,16 @@ export const streamFetch = ({
       const variables = data?.variables || {};
       variables.cTime = formatTime2YMDHMW();
 
+      const phpsessid = getCookie('phpsessid');
+      if (phpsessid) {
+        variables.SYSTEM_SID = phpsessid;
+      }
+
+      const originOrHost = getOriginOrHost();
+      if (originOrHost) {
+        variables.SYSTEM_ORIGIN = originOrHost;
+      }
+
       const requestData = {
         method: 'POST',
         headers: {
@@ -233,3 +243,29 @@ export const streamFetch = ({
       failedFinish(err);
     }
   });
+
+function getCookie(name: string): string | null {
+  const cookieArr = document.cookie.split(';');
+  for (let i = 0; i < cookieArr.length; i++) {
+    let cookiePair = cookieArr[i].split('=');
+    if (name === cookiePair[0].trim()) {
+      return decodeURIComponent(cookiePair[1]);
+    }
+  }
+  return null;
+}
+
+function getOriginOrHost(): string {
+  // window.location.origin 不会返回 'null' 字符串
+  // 它要么返回一个有效的 origin，要么在不支持的浏览器中返回 undefined
+  const origin = window.location.origin;
+  if (origin) {
+    return origin;
+  }
+
+  // 如果 origin 不可用，则使用 host 和 protocol 构建
+  const host = window.location.host;
+  const protocol = window.location.protocol;
+
+  return `${protocol}//${host}`;
+}
