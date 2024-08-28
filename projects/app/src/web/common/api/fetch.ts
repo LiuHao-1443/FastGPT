@@ -119,16 +119,16 @@ export const streamFetch = ({
 
       const user_name_cookie = getCookie('USER_NAME_COOKIE');
       if (user_name_cookie) {
-        variables.SYSTEM_OA_USER_NAME = user_name_cookie;
-      } else {
-        variables.SYSTEM_OA_USER_NAME = '';
-      }
-
-      const oa_user_ud = getCookie('OA_USER_ID');
-      if (oa_user_ud) {
-        variables.SYSTEM_OA_USER_ID = phpsessid;
+        variables.SYSTEM_OA_USER_ID = user_name_cookie;
       } else {
         variables.SYSTEM_OA_USER_ID = '';
+      }
+
+      const oa_user_id = getCookie('OA_USER_ID');
+      if (oa_user_id) {
+        variables.SYSTEM_OA_UID = oa_user_id;
+      } else {
+        variables.SYSTEM_OA_UID = '';
       }
 
       const originOrHost = getOriginOrHost();
