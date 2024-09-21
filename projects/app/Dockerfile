@@ -16,7 +16,7 @@ COPY ./projects/app/package.json ./projects/app/package.json
 
 RUN [ -f pnpm-lock.yaml ] || (echo "Lockfile not found." && exit 1)
 
-RUN pnpm i
+RUN pnpm i --registry=https://mirrors.huaweicloud.com/repository/npm
 
 # --------- builder -----------
 FROM node:20.14.0-alpine AS builder
