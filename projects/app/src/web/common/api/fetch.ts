@@ -138,6 +138,13 @@ export const streamFetch = ({
         variables.SYSTEM_ORIGIN = '';
       }
 
+      const aiAssistantId = getCookie('TD_AI_ASSISTANT_UUID');
+      if (aiAssistantId) {
+        variables.SYSTEM_OA_AI_ASSISTANT_UUID = aiAssistantId;
+      } else {
+        variables.SYSTEM_OA_AI_ASSISTANT_UUID = '';
+      }
+
       const requestData = {
         method: 'POST',
         headers: {
