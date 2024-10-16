@@ -167,6 +167,38 @@ const WelcomeBox = forwardRef(({ welcomeText }, ref) => {
           </Card>
         </Box>
       )}
+
+      {showHelper && (
+        <Box>
+          <Card
+            order={2}
+            mt={2}
+            {...MessageCardStyle}
+            borderRadius={isPc ? '8px' : '0 8px 8px 8px'}
+            bg={'white'}
+            boxShadow={'0 0 8px rgba(0,0,0,0.15)'}
+            w={cardWidth}
+            p={0}
+            cursor={'pointer'}
+            onClick={() => handleClick('请帮我从通搜中查询一下公文类型管理是什么？')}
+          >
+            <CardBody p={0}>
+              <Flex>
+                <Stack pt="3" pr="4" pb="3" pl="4" spacing="1" w={'calc(100% - 30px)'}>
+                  <Flex>
+                    <MyIcon mr={1} name={'tongsou/helper'} w={'20px'} />
+                    <Heading fontSize="sm">通搜搜索</Heading>
+                  </Flex>
+                  <Text fontSize="xs" color={'#949494'}>
+                    请帮我从通搜中搜索一下公文类型管理是什么？
+                  </Text>
+                </Stack>
+                <MyIcon mr={1} name={'common/rightArrowLight'} w={'10px'} />
+              </Flex>
+            </CardBody>
+          </Card>
+        </Box>
+      )}
     </Box>
   );
 });
