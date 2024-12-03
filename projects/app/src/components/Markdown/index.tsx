@@ -10,13 +10,16 @@ import RehypeExternalLinks from 'rehype-external-links';
 import styles from './index.module.scss';
 import dynamic from 'next/dynamic';
 
-import { Link, Button, Box } from '@chakra-ui/react';
+import { Link, Button, Text, Box, Flex, useTheme } from '@chakra-ui/react';
 import MyTooltip from '@fastgpt/web/components/common/MyTooltip';
 import { useTranslation } from 'next-i18next';
 import { EventNameEnum, eventBus } from '@/web/common/utils/eventbus';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import { MARKDOWN_QUOTE_SIGN } from '@fastgpt/global/core/chat/constants';
 import { CodeClassNameEnum } from './utils';
+
+import ChatBoxDivider from '../core/chat/Divider';
+import { useToast } from '@fastgpt/web/hooks/useToast';
 
 const CodeLight = dynamic(() => import('./CodeLight'), { ssr: false });
 const MermaidCodeBlock = dynamic(() => import('./img/MermaidCodeBlock'), { ssr: false });
@@ -38,6 +41,82 @@ const Markdown = ({
   isDisabled?: boolean;
   forbidZhFormat?: boolean;
 }) => {
+  const { toast } = useToast();
+  const { t } = useTranslation();
+  const theme = useTheme();
+
+  const parseJsonSafe = (jsonString: string) => {
+    try {
+      return JSON.parse(jsonString);
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const extractAndParseActions = (source: string) => {
+    const actionRegex = /SYSTEM_ACTION_BEGIN\|(.*?)\|SYSTEM_ACTION_END\n?/g;
+    let match;
+    const actions = [];
+    let newSource = source;
+
+    while ((match = actionRegex.exec(source)) !== null) {
+      const jsonString = match[1];
+      const parsedJson = parseJsonSafe(jsonString);
+      if (parsedJson) {
+        actions.push(parsedJson);
+      }
+      // Remove the matched part from the source including the trailing newline
+      newSource = newSource.replace(match[0], '');
+    }
+
+    return { actions, newSource };
+  };
+
+  const extractAndParseGuessYouWantActions = (source: string) => {
+    const actionRegex = /SYSTEM_GUESS_YOU_WANT_BEGIN\|(.*?)\|SYSTEM_GUESS_YOU_WANT_END\n?/g;
+    let match;
+    const guessYouWantActions = [];
+    let newSource = source;
+
+    while ((match = actionRegex.exec(source)) !== null) {
+      const jsonString = match[1];
+      const parsedJson = parseJsonSafe(jsonString);
+      if (parsedJson) {
+        guessYouWantActions.push(parsedJson);
+      }
+      // Remove the matched part from the source including the trailing newline
+      newSource = newSource.replace(match[0], '');
+    }
+
+    return { guessYouWantActions, newSource };
+  };
+
+  // Example usage:
+  var { actions, newSource } = extractAndParseActions(source);
+  // You can now use `actions` as needed
+
+  var { guessYouWantActions, newSource } = extractAndParseGuessYouWantActions(newSource);
+
+  const handleClick = (action: any, index: number) => {
+    // 在这里处理点击事件，可以根据 action 对象和 index 参数进行操作
+    let noAction = true;
+
+    if (action['ACTION']) {
+      if (action['ACTION'] === 'OPEN_NEW_WINDOW' && action['URL']) {
+        noAction = false;
+        window.open(action['URL'], '_blank'); // 打开新窗口
+        return;
+      }
+    }
+
+    if (!noAction) {
+      toast({
+        status: 'warning',
+        title: t('common:core.chat.Quick Command No Action')
+      });
+    }
+  };
+
   const components = useMemo<any>(
     () => ({
       img: Image,
@@ -84,7 +163,7 @@ const Markdown = ({
   }, []);
 
   return (
-    <Box position={'relative'}>
+    <>
       <ReactMarkdown
         className={`markdown ${styles.markdown}
       ${showAnimation ? `${formatSource ? styles.waitingAnimation : styles.animation}` : ''}
@@ -92,12 +171,117 @@ const Markdown = ({
         remarkPlugins={[RemarkMath, [RemarkGfm, { singleTilde: false }], RemarkBreaks]}
         rehypePlugins={[RehypeKatex, [RehypeExternalLinks, { target: '_blank' }]]}
         components={components}
-        urlTransform={urlTransform}
       >
         {formatSource}
       </ReactMarkdown>
-      {isDisabled && <Box position={'absolute'} top={0} right={0} left={0} bottom={0} />}
-    </Box>
+
+      {actions.length > 0 && (
+        <Box mt={2}>
+          <ChatBoxDivider
+            icon="core/chat/quickCommand"
+            text={t('common:core.chat.Quick Command')}
+          />
+          <Flex alignItems={'center'} flexWrap={'wrap'} gap={2}>
+            {actions.map((action, index) => (
+              <Flex
+                key={action.text}
+                alignItems={'center'}
+                flexWrap={'wrap'}
+                fontSize={'xs'}
+                border={theme.borders.sm}
+                py={'1px'}
+                px={3}
+                borderRadius={'md'}
+                _hover={{
+                  backgroundColor: 'gray.100' // 你可以根据需要调整颜色
+                }}
+                overflow={'hidden'}
+                position={'relative'}
+                cursor="pointer"
+                onClick={() => handleClick(action, index)}
+              >
+                <Box className="textEllipsis" flex={'1 0 0'}>
+                  {action['TEXT']}
+                </Box>
+              </Flex>
+            ))}
+          </Flex>
+        </Box>
+      )}
+
+      {guessYouWantActions.length > 0 && (
+        <Box mt={2}>
+          <ChatBoxDivider
+            icon="core/chat/guessYouWant"
+            text={t('common:core.chat.Guess You Want')}
+          />
+          <Flex alignItems={'center'} flexWrap={'wrap'} gap={2}>
+            {guessYouWantActions.map((action, index) => (
+              <Flex
+                key={action.text}
+                alignItems={'center'}
+                flexWrap={'wrap'}
+                fontSize={'xs'}
+                border={theme.borders.sm}
+                py={'1px'}
+                px={3}
+                borderRadius={'md'}
+                _hover={{
+                  '.controller': {
+                    display: 'flex'
+                  }
+                }}
+                overflow={'hidden'}
+                position={'relative'}
+              >
+                <Box className="textEllipsis" flex={'1 0 0'}>
+                  {action['TEXT']}
+                </Box>
+                <Box
+                  className="controller"
+                  display={'none'}
+                  pr={2}
+                  position={'absolute'}
+                  right={0}
+                  left={0}
+                  justifyContent={'flex-end'}
+                  alignItems={'center'}
+                  h={'100%'}
+                  lineHeight={0}
+                  bg={`linear-gradient(to left, white,white min(60px,100%),rgba(255,255,255,0) 80%)`}
+                >
+                  <MyTooltip label={t('common:core.chat.markdown.Edit Question')}>
+                    <MyIcon
+                      name={'edit'}
+                      w={'14px'}
+                      cursor={'pointer'}
+                      _hover={{
+                        color: 'green.600'
+                      }}
+                      onClick={() =>
+                        eventBus.emit(EventNameEnum.editQuestion, { text: action['TEXT'] })
+                      }
+                    />
+                  </MyTooltip>
+                  <MyTooltip label={t('common:core.chat.markdown.Send Question')}>
+                    <MyIcon
+                      ml={4}
+                      name={'core/chat/sendLight'}
+                      w={'14px'}
+                      cursor={'pointer'}
+                      _hover={{ color: 'primary.500' }}
+                      onClick={() =>
+                        eventBus.emit(EventNameEnum.sendQuestion, { text: action['TEXT'] })
+                      }
+                    />
+                  </MyTooltip>
+                </Box>
+              </Flex>
+            ))}
+          </Flex>
+        </Box>
+      )}
+    </>
   );
 };
 

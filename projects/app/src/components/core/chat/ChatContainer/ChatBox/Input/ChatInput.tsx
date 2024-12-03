@@ -189,7 +189,12 @@ const ChatInput = ({
 
   const RenderTextarea = useMemo(
     () => (
-      <Flex alignItems={'flex-end'} mt={fileList.length > 0 ? 1 : 0} pl={[2, 4]}>
+      <Flex
+        alignItems={'flex-end'}
+        mt={fileList.length > 0 ? 1 : 0}
+        pb={['20px', '0px']}
+        pl={[2, 4]}
+      >
         {/* file selector */}
         {(showSelectFile || showSelectImg) && (
           <Flex
@@ -219,6 +224,10 @@ const ChatInput = ({
           border={'none'}
           _focusVisible={{
             border: 'none'
+          }}
+          _placeholder={{
+            fontSize: ['14px', '18px'], // 增大 placeholder 的字体大小
+            color: 'myGray.300' // 可选:自定义 placeholder 的颜色
           }}
           placeholder={
             isSpeaking
@@ -291,7 +300,7 @@ const ChatInput = ({
             }
           }}
         />
-        <Flex alignItems={'center'} position={'absolute'} right={[2, 4]} bottom={['10px', '12px']}>
+        <Flex alignItems={'center'} position={'absolute'} right={[3, 4]} bottom={['13px', '12px']}>
           {/* voice-input */}
           {whisperConfig.open && !inputValue && !isChatting && !!whisperModel && (
             <>
@@ -467,11 +476,14 @@ const ChatInput = ({
       }}
     >
       <Box
-        pt={fileList.length > 0 ? '0' : ['14px', '18px']}
-        pb={['14px', '18px']}
+        pt={fileList.length > 0 ? '0' : ['16px', '18px']}
+        pb={['28px', '18px']}
+        mb={['28px', '18px']}
+        ml={['30px', 'auto']}
+        mr={['30px', 'auto']}
         position={'relative'}
         boxShadow={isSpeaking ? `0 0 10px rgba(54,111,255,0.4)` : `0 0 10px rgba(0,0,0,0.2)`}
-        borderRadius={['none', 'md']}
+        borderRadius={['20px', 'md']}
         bg={'white'}
         overflow={'display'}
         {...(isPc
