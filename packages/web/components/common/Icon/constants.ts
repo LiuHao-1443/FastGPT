@@ -381,5 +381,13 @@ export const iconPaths = {
   union: () => import('./icons/union.svg'),
   user: () => import('./icons/user.svg'),
   visible: () => import('./icons/visible.svg'),
-  wx: () => import('./icons/wx.svg')
+  wx: () => import('./icons/wx.svg'),
+
+  // New icon
+  'knowledge/helper': () => import('./icons/knowledge/helper.svg'),
+  'notice/helper': () => import('./icons/notice/helper.svg'),
+  'appcenter/form/helper': () => import('./icons/appcenter/form/helper.svg'),
+  'tongsou/helper': () => import('./icons/tongsou/helper.svg'),
+  'core/chat/quickCommand': () => import('./icons/core/chat/quickCommand.svg'),
+  'core/chat/guessYouWant': () => import('./icons/core/chat/guessYouWant.svg')
 };
