@@ -57,6 +57,9 @@ const ChatHeader = ({
             chatModels={chatData.app.chatModels}
           />
           <Box flex={1} />
+
+          {/* control */}
+          {!isPlugin && <ToolMenu history={history} onRouteToAppDetail={onRouteToAppDetail} />}
         </>
       ) : (
         <MobileHeader
@@ -225,12 +228,12 @@ const MobileHeader = ({
 
   return (
     <>
-      {showHistory && (
+      {false && showHistory && (
         <MyIcon name={'menu'} w={'20px'} h={'20px'} color={'myGray.900'} onClick={onOpenSlider} />
       )}
       <Flex px={3} alignItems={'center'} flex={'1 0 0'} w={0} justifyContent={'center'}>
         <Flex alignItems={'center'} onClick={toggleDrawer}>
-          <Avatar borderRadius={'sm'} src={avatar} w={'1rem'} />
+          {/* <Avatar borderRadius={'sm'} src={avatar} w={'1rem'} /> */}
           <Box ml={1} className="textEllipsis">
             {name}
           </Box>
