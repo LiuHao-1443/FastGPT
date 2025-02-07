@@ -59,7 +59,7 @@ const ChatHeader = ({
           <Box flex={1} />
 
           {/* control */}
-          {!isPlugin && <ToolMenu history={history} onRouteToAppDetail={onRouteToAppDetail} />}
+          {!isPlugin && <ToolMenu history={history} />}
         </>
       ) : (
         <MobileHeader
